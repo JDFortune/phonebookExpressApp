@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "test": "echo \"These droids are not the one you're looking for\" && exit 1"
+    "test": "echo \"These droids are not the one you're looking for\" && exit 1",
+    "build:ui": "rm -rf dist && cd ../phonebookFrontEnd && npm run build && cp -r dist ../phonebookBackend",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "author": "JD Fortune",
   "license": "MIT",
