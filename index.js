@@ -3,7 +3,7 @@ const app = express();
 const morgan = require('morgan');
 const cors = require('cors');
 
-let contacts = [
+let persons = [
   { 
     "id": "1",
     "name": "Arto Hellas", 
@@ -42,19 +42,19 @@ app.get('/info', (request, response) => {
   let date = new Date()
   response.send(
     `<div>
-      <p>Phonebook has response for ${contacts.length} people</p>
+      <p>Phonebook has response for ${persons.length} people</p>
       <p>${date}</p>
     </div>`
   )
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(contacts);
+  response.json(persons);
 });
 
 app.get('/api/persons/:id', (request, response) => {
   const id = request.params.id;
-  const person = contacts.find(p => p.id === id);
+  const person = persons.find(p => p.id === id);
 
   if (person) {
     response.json(person);
@@ -66,14 +66,14 @@ app.get('/api/persons/:id', (request, response) => {
 app.delete('/api/persons/:id', (request, response) => {
   let id = request.params.id;
 
-  contacts = contacts.filter(c => c.id !== id);
+  persons = persons.filter(c => c.id !== id);
 
   response.status(204).end();
 })
 
 function generateId() {
-  const id =  contacts.length > 0
-    ? Math.max(...contacts.map(c => Number(c.id)))
+  const id =  persons.length > 0
+    ? Math.max(...persons.map(c => Number(c.id)))
     : 0
 
   return String(id + 1)
@@ -88,21 +88,35 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  if (contacts.some(c => c.name === body.name)) {
+  if (persons.some(c => c.name === body.name)) {
     return response.status(404).json({
-      "error": "contact names must be unique",
+      "error": "person names must be unique",
     });
   }
 
-  let contact = {
+  let person = {
     id: generateId(),
     name: body.name,
     number: body.number
   }
 
-  contacts = contacts.concat(contact);
-  response.json(contact)
+  persons = persons.concat(person);
+  response.json(person)
 })
+
+app.put('/api/persons/:id', (request, response) => {
+  const body = request.body;
+  const id = request.params.id;
+  const person = persons.find(p => p.id === id);
+
+  if (person) {
+    Object.assign(person, body);
+    response.send(person);
+  } else {
+    console.log('Something went wrong');
+  }
+  
+});
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({error: 'unknown endpoint'})
