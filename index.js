@@ -1,42 +1,15 @@
+require('dotenv').config()
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const cors = require('cors');
-
-let persons = [
-  { 
-    "id": "1",
-    "name": "Arto Hellas", 
-    "number": "040-123456"
-  },
-  { 
-    "id": "2",
-    "name": "Ada Lovelace", 
-    "number": "39-44-5323523"
-  },
-  { 
-    "id": "3",
-    "name": "Dan Abramov", 
-    "number": "12-43-234345"
-  },
-  { 
-    "id": "4",
-    "name": "Mary Poppendieck", 
-    "number": "39-23-6423122"
-  }
-]
+const Person = require('./models/person');
 
 app.use(express.json())
 morgan.token('data', function (req, res) {return JSON.stringify(req.body)})
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'));
 app.use(cors());
 app.use(express.static('dist'));
-
-// app.get('/favicon.ico', (req, res) => {})
-
-app.get('/', (request, response) => {
-  response.send('<h1>Hello World</h1>');
-})
 
 app.get('/info', (request, response) => {
   let date = new Date()
@@ -49,21 +22,25 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons);
+  Person.find({}).then(people => {
+    response.json(people);
+  })
 });
 
 app.get('/api/persons/:id', (request, response) => {
-  const id = request.params.id;
-  const person = persons.find(p => p.id === id);
-
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
-})
+  Person.findById(request.params.id)
+    .then(person => {
+      response.json(person);
+    })
+    .catch(error => {
+      response.status(404).json({
+        error: 'Person not found',
+      });
+    });
+});
 
 app.delete('/api/persons/:id', (request, response) => {
+
   let id = request.params.id;
 
   persons = persons.filter(c => c.id !== id);
@@ -88,20 +65,38 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  if (persons.some(c => c.name === body.name)) {
-    return response.status(404).json({
-      "error": "person names must be unique",
-    });
-  }
+  Person.find({})
+    .then(people => {
+      if (people.some(c => c.name === body.name)) {
+        return response.status(404).json({
+          error: 'Names must be unique'
+        });
+      }
 
-  let person = {
-    id: generateId(),
-    name: body.name,
-    number: body.number
-  }
+      const person = new Person({
+        name: body.name,
+        number: body.number,
+      });
 
-  persons = persons.concat(person);
-  response.json(person)
+      person.save().then(newPerson => {
+        console.log('New Person Created:', newPerson);
+        response.json(newPerson);
+      });
+    })
+  // if (persons.some(c => c.name === body.name)) {
+  //   return response.status(404).json({
+  //     "error": "person names must be unique",
+  //   });
+  // }
+
+  // let person = {
+  //   id: generateId(),
+  //   name: body.name,
+  //   number: body.number
+  // }
+
+  // persons = persons.concat(person);
+  // response.json(person)
 })
 
 app.put('/api/persons/:id', (request, response) => {
