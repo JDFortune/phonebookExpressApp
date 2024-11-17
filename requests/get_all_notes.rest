@@ -2,11 +2,11 @@ GET http://localhost:3001/api/persons
 
 ###
 
-GET http://localhost:3001/api/persons/673796325530afdd903c490d
+GET http://localhost:3001/api/persons/673a5ed6b43ea466b7b75908
 
 ###
 
-DELETE http://localhost:3001/api/persons/5
+DELETE http://localhost:3001/api/persons/6737e396e0d164b4ae4d13c0
 
 ###
 
@@ -17,3 +17,7 @@ Content-Type: application/json
   "name": "Hamlet",
   "number": "866-501-3337"
 }
+
+###
+
+GET http://localhost:3001/info
