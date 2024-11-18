@@ -7,7 +7,8 @@
     "test": "echo \"These droids are not the one you're looking for\" && exit 1",
     "start": "node index.js",
     "build:ui": "rm -rf dist && cd ../phonebookFrontEnd && npm run build && cp -r dist ../phonebookBackend",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "lint": "eslint ."
   },
   "author": "JD Fortune",
   "license": "MIT",
@@ -21,6 +22,10 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "@stylistic/eslint-plugin-js": "^2.10.1",
+    "eslint": "^9.15.0",
+    "globals": "^15.12.0",
     "nodemon": "^3.1.7"
   }
 }
